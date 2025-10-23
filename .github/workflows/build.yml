@@ -8,14 +8,10 @@ jobs:
             - name: Checkout Reposistory code
               uses: actions/checkout@v5
             - name: Build app for Windows amd64
-              uses: GOOS=windows GOARCH=amd64 go build -o playground_windows_amd64.exe .
+              run: GOOS=windows GOARCH=amd64 go build -o playground_windows_amd64.exe .
             - name: Build app for Linux amd64
-              uses: GOOS=linux GOARCH=amd64 go build -o playground_linux_amd64 .
+              run: GOOS=linux GOARCH=amd64 go build -o playground_linux_amd64 .
             - name: Build app for Linux arm64
-              uses: GOOS=linux GOARCH=amd64 go build -o playground_linux_arm64 .
+              run: GOOS=linux GOARCH=amd64 go build -o playground_linux_arm64 .
             - name: Build app for Darwin arm64
-              uses: GOOS=darwin GOARCH=amd64 go build -o playground_darwin_arm64 .
-            # - run: ls- lah
-            #     - name: Upload artifact
-            #       uses: actions/upload-artifact@v4
-            #       whi 
+              run: GOOS=darwin GOARCH=amd64 go build -o playground_darwin_arm64 .
