@@ -15,8 +15,24 @@ jobs:
               run: GOOS=linux GOARCH=amd64 go build -o playground_linux_arm64 .
             - name: Build app for Darwin arm64
               run: GOOS=darwin GOARCH=amd64 go build -o playground_darwin_arm64 .
-            - name: Upload artifact
+            - name: Upload artifact for windows
               uses: actions/upload-artifact@v4
               with:
-                name: programs
-                path: ./playground_*
+                name: playground_windows_amd64
+                path: ./playground_windows_amd64.exe
+
+            - name: Upload artifact for linux arm64
+              uses: actions/upload-artifact@v4
+              with:
+                name: playground_linux_arm64
+                path: ./playground_linux_arm64
+            - name: Upload artifact for linux amd64
+              uses: actions/upload-artifact@v4
+              with:
+                name: playground_linux_amd64
+                path: ./playground_linux_amd64
+            - name: Upload artifact for darwin
+              uses: actions/upload-artifact@v4
+              with:
+                name: playground_darwin_arm64
+                path: ./playground_darwin_arm64
