@@ -8,8 +8,9 @@ import (
 )
 
 type AuthInterface interface {
-	Register(firstname, lastname, email, password, confirm string)
-	Login(email, password string)
+	Register()
+	Login()
+	ForgotPassword()
 }
 
 type AuthSystem struct {
@@ -22,66 +23,141 @@ func readInput(reader *bufio.Reader) string {
 }
 
 func (a *AuthSystem) Register() {
-	var inputemail string
-	var inputFirstname string
-	var inputLastname string
-	var inputpassword string
-	var inputconfirm string
-	// var Continue string
-
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("--- Register ---")
-	fmt.Print("What is your first name: ")
-	inputFirstname = readInput(reader)
-	fmt.Print("What is your last name: ")
-	inputLastname = readInput(reader)
-	fmt.Print("What is your email: ")
-	inputemail = readInput(reader)
-	fmt.Print("Enter a strong password: ")
-	inputpassword = readInput(reader)
-	fmt.Print("Confirm your password: ")
-	inputconfirm = readInput(reader)
-	if inputpassword != inputconfirm {
-		panic("Wrong confirm password, press enter to back!")
-	}
-	a.Users[inputemail] = &User{
-		Firstname: inputFirstname,
-		Lastname:  inputLastname,
-		Email:     inputemail,
-		Password:  inputpassword,
-	}
-	fmt.Println("\nIs it true?")
-	fmt.Println("firstname : ", inputFirstname)
-	fmt.Println("lastname : ", inputLastname)
-	fmt.Println("email : ", inputemail)
-	fmt.Print("Continue? (Y/n): ")
-	// Continue := readInput(reader)
-	// fmt.Print(Continue)
+	for {
+		fmt.Println("--- Register ---")
 
-	// var choice string
-	// fmt.Scanln(&choice)
-	// switch choice {
-	// case "Y":
-	// 	fmt.Print(Continue)
-	// case "N":
+		fmt.Print("What is your first name: ")
+		inputFirstname := readInput(reader)
 
-	// }
+		fmt.Print("What is your last name: ")
+		inputLastname := readInput(reader)
+
+		fmt.Print("What is your email: ")
+		inputEmail := readInput(reader)
+		if _, exists := a.Users[inputEmail]; exists {
+			panic("Email is used!")
+		}
+
+		fmt.Print("Enter a strong password: ")
+		inputPassword := readInput(reader)
+
+		fmt.Print("Confirm your password: ")
+		inputConfirm := readInput(reader)
+
+		if inputPassword != inputConfirm {
+			fmt.Print("Wrong confirm password. Press Enter to try again.")
+			readInput(reader)
+			continue
+		}
+
+		fmt.Println("\nIs this information correct?")
+		fmt.Println("Firstname :", inputFirstname)
+		fmt.Println("Lastname  :", inputLastname)
+		fmt.Println("Email     :", inputEmail)
+
+		fmt.Print("Continue? (Y/n): ")
+		confirm := strings.ToUpper(readInput(reader))
+
+		if confirm == "Y" {
+			a.Users[inputEmail] = &User{
+				Firstname: inputFirstname,
+				Lastname:  inputLastname,
+				Email:     inputEmail,
+				Password:  inputPassword,
+			}
+			fmt.Print("Register success, press enter to back..")
+			readInput(reader)
+			break
+		}
+	}
 }
 
 func (a *AuthSystem) Login() {
-	var inputemail string
-	var inputpassword string
-
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("--- LOGIN ---")
-	fmt.Print("Masukkan Email: ")
-	inputemail = readInput(reader)
-	fmt.Print("Masukkan Password: ")
-	inputpassword = readInput(reader)
-	user, exists := a.Users[inputemail]
-	if !exists || user.Password != inputpassword {
-		panic("Wrong email or password, press enter to restart")
+
+	for {
+		fmt.Println("--- LOGIN ---")
+		fmt.Print("Enter your Email: ")
+		inputEmail := readInput(reader)
+
+		fmt.Print("Enter your Password: ")
+		inputPassword := readInput(reader)
+
+		user, exists := a.Users[inputEmail]
+		if !exists || user.Password != inputPassword {
+			fmt.Print("Wrong email or password. Press enter to restart.")
+			readInput(reader)
+			continue
+		}
+
+		fmt.Print("Login success! Press enter to back..")
+		readInput(reader)
+
+		a.Dashboard(user)
+		break
 	}
-	fmt.Println("Login success, press enter to back..")
 }
 
+func (a *AuthSystem) Dashboard(user *User) {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Printf("\nHello %s!\n", user.Firstname)
+		fmt.Println("1. List All Users")
+		fmt.Println("2. Logout")
+		fmt.Println("\n0. Exit")
+		fmt.Print("Choose a menu: ")
+
+		choice := readInput(reader)
+
+		switch choice {
+		case "1":
+			fmt.Println("\n--- List all users ---")
+			for _, u := range a.Users {
+				fmt.Printf("- firstname: %s lastname: %s email: (%s)\n", u.Firstname, u.Lastname, u.Email)
+			}
+		case "2":
+			fmt.Print("Logout success, press enter to back..")
+			readInput(reader)
+			return
+		case "0":
+			os.Exit(0)
+		default:
+			fmt.Println("Invalid choice, press enter to back..")
+			readInput(reader)
+		}
+	}
+}
+
+func (a *AuthSystem) ForgotPassword() {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Println("--- Forgot Password ---")
+		fmt.Print("Enter your email: ")
+		inputEmail := readInput(reader)
+		if _, exists := a.Users[inputEmail]; !exists {
+			fmt.Print("Email not found, press enter to restart")
+			readInput(reader)
+			continue
+		} 
+
+		fmt.Print("Enter a strong password: ")
+		inputPassword := readInput(reader)
+
+		fmt.Print("Confirm your password: ")
+		inputConfirm := readInput(reader)
+
+		if inputPassword != inputConfirm {
+			fmt.Print("Wrong confirm password, press enter to back!")
+			readInput(reader)
+			continue
+		} else {
+			a.Users[inputEmail].Password = inputPassword
+			fmt.Print("Password changed, press enter to back")
+			readInput(reader)
+			break
+		}
+	}
+}
