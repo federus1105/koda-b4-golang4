@@ -14,8 +14,8 @@ func main() {
 			main()
 		}
 	}()
-
 	a := &internals.AuthSystem{Users: make(map[string]*internals.User)}
+	var auth internals.AuthInterface = a
 
 	for {
 		fmt.Println("\n====> Hi, Welcome to Sistem <===")
@@ -30,14 +30,15 @@ func main() {
 
 		switch input {
 		case "1":
-			a.Register()
+			auth.Register()
 
 		case "2":
-			a.Login()
+			auth.Login()
 
+		case "3":
+			auth.ForgotPassword()
 		case "0":
 			os.Exit(0)
-
 		default:
 			fmt.Println("Wrong selection!")
 		}
