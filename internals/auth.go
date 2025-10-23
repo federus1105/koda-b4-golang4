@@ -41,6 +41,8 @@ func (a *AuthSystem) Register() {
 
 		fmt.Print("Enter a strong password: ")
 		inputPassword := readInput(reader)
+		md5Hash := GenerateMD5Hash(inputPassword)
+		_ = md5Hash
 
 		fmt.Print("Confirm your password: ")
 		inputConfirm := readInput(reader)
@@ -141,7 +143,7 @@ func (a *AuthSystem) ForgotPassword() {
 			fmt.Print("Email not found, press enter to restart")
 			readInput(reader)
 			continue
-		} 
+		}
 
 		fmt.Print("Enter a strong password: ")
 		inputPassword := readInput(reader)
